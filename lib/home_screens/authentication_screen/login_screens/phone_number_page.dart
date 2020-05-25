@@ -2,7 +2,7 @@ import 'package:bhavaniconnect/common_variables/app_colors.dart';
 import 'package:bhavaniconnect/common_variables/app_fonts.dart';
 import 'package:bhavaniconnect/common_variables/app_functions.dart';
 import 'package:bhavaniconnect/common_widgets/button_widget/to_do_button.dart';
-import 'package:bhavaniconnect/common_widgets/loading_page.dart';
+
 import 'package:bhavaniconnect/common_widgets/offline_widgets/offline_widget.dart';
 import 'package:bhavaniconnect/common_widgets/platform_alert/platform_exception_alert_dialog.dart';
 import 'package:bhavaniconnect/home_page.dart';
@@ -47,6 +47,7 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
   final FocusNode _phoneNumberFocusNode = FocusNode();
   // PhoneNumberModel get model => widget.model;
   bool _btnEnabled = false;
+  bool _optBtnEnabled = false;
 
   Future<bool> didCheckPhoneNumber;
 
@@ -119,6 +120,15 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
               //  onChanged: model.updatePhoneNumber,
               onChanged: (value) {
                 this.phoneNo = value;
+                if (value.length == 10) {
+                  setState(() {
+                    _btnEnabled = true;
+                  });
+                } else {
+                  setState(() {
+                    _btnEnabled = false;
+                  });
+                }
               },
               decoration: new InputDecoration(
                 prefixIcon: Icon(
@@ -132,7 +142,6 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
                   borderSide: new BorderSide(),
                 ),
               ),
-              // autovalidate: true,
               validator: (val) {
                 if (val.length == 0) {
                   return "Phone number cannot be empty";
@@ -159,8 +168,8 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
               text: 'Get OTP',
               textColor: Colors.white,
               backgroundColor: activeButtonBackgroundColor,
-              // onPressed: _btnEnabled ? verifyPhone : null,
-              onPressed: verifyPhone,
+              onPressed: _btnEnabled ? verifyPhone : null,
+              // onPressed: verifyPhone,
               // onPressed: () {
               //   GoToPage(context, OTPPage());
               // },
@@ -187,7 +196,6 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
       smsOTPDialog(context).then((value) {
         print('sign in');
       });
-
       // _checkForUser(context);
     };
     try {
@@ -225,6 +233,16 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
                 TextField(
                   onChanged: (value) {
                     this.smsOTP = value;
+                    print(value.length);
+                    if (value.length == 6) {
+                      setState(() {
+                        _optBtnEnabled = true;
+                      });
+                    } else {
+                      setState(() {
+                        _optBtnEnabled = false;
+                      });
+                    }
                   },
                 ),
                 (errorMessage != ''
@@ -240,13 +258,15 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
               FlatButton(
                 child: Text('Done'),
                 onPressed: () {
-                  _auth.currentUser().then((user) {
-                    if (user != null) {
-                      checkUserInFirestore(user.uid);
-                    } else {
-                      signIn();
-                    }
-                  });
+                  _optBtnEnabled
+                      ? _auth.currentUser().then((user) {
+                          if (user != null) {
+                            checkUserInFirestore(user.uid);
+                          } else {
+                            signIn();
+                          }
+                        })
+                      : print('null----------');
                 },
               )
             ],
@@ -257,23 +277,23 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
   checkUserInFirestore(String userId) async {
     await usersRef.document(userId).get().then((doc) {
       if (doc.exists) {
+        print('HomePage 1--------------------');
         Navigator.of(context).pop();
         GoToPage(context, HomePage());
       } else {
-        DocumentReference documentReference = usersRef.document();
+        print('SignUpPage 1------------------');
+        DocumentReference documentReference = usersRef.document(userId);
         documentReference.setData({
           "phoneNumber": '+91${this.phoneNo}',
           "status": 0,
           "joinedDate": DateTime.now().toUtc(),
         }).then((val) {
-          String documentId = documentReference.documentID;
-          print(documentId);
-          print('documentid_------------------------------');
+          // String documentId = documentReference.documentID;
           Navigator.of(context).pop();
           GoToPage(
               context,
               SignUpPage(
-                documentId: documentId,
+                documentId: userId,
                 phoneNo: _phoneNumberController.value.text,
               ));
         });
@@ -290,8 +310,9 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
       final AuthResult user = await _auth.signInWithCredential(credential);
       final FirebaseUser currentUser = await _auth.currentUser();
       assert(user.user.uid == currentUser.uid);
-      Navigator.of(context).pop();
-      GoToPage(context, SignUpPage());
+      print('SignUpPage 2---------------');
+      // Navigator.of(context).pop();
+      // GoToPage(context, SignUpPage());
     } catch (e) {
       handleError(e);
     }
@@ -308,7 +329,7 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
         // _checkForUser(context);
         Navigator.of(context).pop();
         smsOTPDialog(context).then((value) {
-          print('sign in');
+          print('sign in - handleError');
         });
         break;
       default:
@@ -320,38 +341,38 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
     }
   }
 
-  _checkForUser(BuildContext context) async {
-    try {
-      usersRef
-          .where('phoneNumber',
-              isEqualTo: '+91${_phoneNumberController.value.text}')
-          .snapshots()
-          .listen((data) => {
-                print('data=$data'),
-                if (data.documents.length == 0)
-                  {
-                    // model.submit(),
-                    GoToPage(
-                        context,
-                        OTPPage(
-                            phoneNo: _phoneNumberController.value.text,
-                            newUser: true))
-                  }
-                else
-                  {
-                    //model.submit(),
-                    GoToPage(
-                        context,
-                        OTPPage(
-                            phoneNo: _phoneNumberController.value.text,
-                            newUser: false))
-                  }
-              });
-    } on PlatformException catch (e) {
-      PlatformExceptionAlertDialog(
-        title: 'Phone number failed',
-        exception: e,
-      ).show(context);
-    }
-  }
+  // _checkForUser(BuildContext context) async {
+  //   try {
+  //     usersRef
+  //         .where('phoneNumber',
+  //             isEqualTo: '+91${_phoneNumberController.value.text}')
+  //         .snapshots()
+  //         .listen((data) => {
+  //               print('data=$data'),
+  //               if (data.documents.length == 0)
+  //                 {
+  //                   // model.submit(),
+  //                   GoToPage(
+  //                       context,
+  //                       OTPPage(
+  //                           phoneNo: _phoneNumberController.value.text,
+  //                           newUser: true))
+  //                 }
+  //               else
+  //                 {
+  //                   //model.submit(),
+  //                   GoToPage(
+  //                       context,
+  //                       OTPPage(
+  //                           phoneNo: _phoneNumberController.value.text,
+  //                           newUser: false))
+  //                 }
+  //             });
+  //   } on PlatformException catch (e) {
+  //     PlatformExceptionAlertDialog(
+  //       title: 'Phone number failed',
+  //       exception: e,
+  //     ).show(context);
+  //   }
+  // }
 }

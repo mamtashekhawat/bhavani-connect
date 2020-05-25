@@ -64,6 +64,8 @@ dependencies:
   slide_to_confirm: 0.0.6
   toast:
   path_provider: ^1.6.9
+  firebase_messaging: ^6.0.15
+  device_info: ^0.4.2+4
 
 dev_dependencies:
   flutter_test:
