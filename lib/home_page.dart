@@ -7,19 +7,23 @@ import 'common_widgets/navigationBar.dart';
 import 'common_widgets/offline_widgets/offline_widget.dart';
 
 class HomePage extends StatelessWidget {
+  final String currentUserId;
+  const HomePage({Key key, this.currentUserId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: F_HomePage(),
+      child: F_HomePage(
+        currentUserId: currentUserId,
+      ),
     );
   }
 }
 
 class F_HomePage extends StatefulWidget {
-  F_HomePage({Key key, this.title}) : super(key: key);
-
+  final String currentUserId;
   final String title;
+  F_HomePage({Key key, this.title, this.currentUserId}) : super(key: key);
 
   @override
   _F_HomePageState createState() => _F_HomePageState();
@@ -51,10 +55,13 @@ class _F_HomePageState extends State<F_HomePage> {
     switch (currentIndex) {
       case 0:
         child = Dashboard(
+          currentUserId: widget.currentUserId,
         );
         break;
       case 1:
-        child = ProfilePage();
+        child = ProfilePage(
+          currentUserId: widget.currentUserId,
+        );
         break;
     }
     return Scaffold(

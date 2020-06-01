@@ -14,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bhavaniconnect/common_widgets/firebase_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PhoneNumberPage extends StatelessWidget {
   @override
@@ -275,11 +276,20 @@ class _F_PhoneNumberPageState extends State<F_PhoneNumberPage> {
   }
 
   checkUserInFirestore(String userId) async {
-    await usersRef.document(userId).get().then((doc) {
+    await usersRef.document(userId).get().then((doc) async {
       if (doc.exists) {
-        print('HomePage 1--------------------');
+        print('HomePage 1------------${doc.documentID}--------');
+
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
+        // var currentUserId = prefs.setString("currentUserId", doc.documentID);
+        var currentUserId = doc.documentID;
+
         Navigator.of(context).pop();
-        GoToPage(context, HomePage());
+        GoToPage(
+            context,
+            HomePage(
+              currentUserId: currentUserId,
+            ));
       } else {
         print('SignUpPage 1------------------');
         DocumentReference documentReference = usersRef.document(userId);

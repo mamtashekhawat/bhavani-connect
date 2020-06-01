@@ -1,6 +1,7 @@
 import 'package:bhavaniconnect/common_variables/app_colors.dart';
 import 'package:bhavaniconnect/common_variables/app_fonts.dart';
 import 'package:bhavaniconnect/common_widgets/custom_appbar_widget/custom_app_bar_2.dart';
+import 'package:bhavaniconnect/common_widgets/firebase_widget.dart';
 import 'package:bhavaniconnect/common_widgets/offline_widgets/offline_widget.dart';
 import 'package:bhavaniconnect/home_screens/Concrete_Entries/Print_preview.dart';
 import 'package:bhavaniconnect/home_screens/Site_Activities/print_preview.dart';
@@ -11,15 +12,21 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class PrintEntries extends StatelessWidget {
+  final String currentUserid;
+  const PrintEntries({Key key, this.currentUserid}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: F_PrintEntries(),
+      child: F_PrintEntries(currentUserid: currentUserid),
     );
   }
 }
 
 class F_PrintEntries extends StatefulWidget {
+  final String currentUserid;
+  const F_PrintEntries({Key key, this.currentUserid}) : super(key: key);
+
   @override
   _F_PrintEntries createState() => _F_PrintEntries();
 }
@@ -34,37 +41,42 @@ class _F_PrintEntries extends State<F_PrintEntries> {
       context: context,
       initialDate: DateTime(2010),
       firstDate: DateTime(1930),
-      lastDate: DateTime(2010),
+      lastDate: DateTime(lastDateYear, 6),
     );
-    if (pickedFrom != null){
+    if (pickedFrom != null) {
       setState(() {
         print(customFormat.format(pickedFrom));
         selectedDateFrom = pickedFrom;
       });
     }
   }
+
+  var _selectedConstructionSite = '';
+  var _selectedBlock = '';
+  var _selectedConcreteType = '';
+
   Future<Null> showPickerTo(BuildContext context) async {
     final DateTime pickedTo = await showDatePicker(
       context: context,
       initialDate: DateTime(2010),
       firstDate: DateTime(1930),
-      lastDate: DateTime(2010),
+      lastDate: DateTime(lastDateYear, 6),
     );
-    if (pickedTo != null){
+    if (pickedTo != null) {
       setState(() {
         print(customFormat.format(pickedTo));
         selectedDateTo = pickedTo;
       });
     }
   }
+
   final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return offlineWidget(context);
-
   }
 
-  Widget offlineWidget (BuildContext context){
+  Widget offlineWidget(BuildContext context) {
     return CustomOfflineWidget(
       onlineChild: Padding(
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -79,25 +91,29 @@ class _F_PrintEntries extends State<F_PrintEntries> {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: PreferredSize(
-        preferredSize:
-        Size.fromHeight(70),
+        preferredSize: Size.fromHeight(72),
         child: CustomAppBarDark(
-          leftActionBar: Icon(Icons.arrow_back_ios,size: 25,color: Colors.white,),
-          leftAction: (){
-            Navigator.pop(context,true);
+          leftActionBar: Icon(
+            Icons.arrow_back_ios,
+            size: 25,
+            color: Colors.white,
+          ),
+          leftAction: () {
+            Navigator.pop(context, true);
           },
-          rightActionBar: Container(width: 10,),
-          rightAction: (){
+          rightActionBar: Container(
+            width: 10,
+          ),
+          rightAction: () {
             print('right action bar is pressed in appbar');
           },
           primaryText: 'Print Entries',
           tabBarWidget: null,
         ),
       ),
-      body:ClipRRect(
+      body: ClipRRect(
         borderRadius: BorderRadius.only(
-            topRight: Radius.circular(50.0),
-            topLeft: Radius.circular(50.0)),
+            topRight: Radius.circular(50.0), topLeft: Radius.circular(50.0)),
         child: Container(
           color: Colors.white,
           child: Form(
@@ -108,58 +124,132 @@ class _F_PrintEntries extends State<F_PrintEntries> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    SizedBox(height: 20,),
+                    SizedBox(
+                      height: 20,
+                    ),
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Construction Site",style: titleStyle,),
-                          SizedBox(height: 20,),
+                          Text(
+                            "Construction Site",
+                            style: titleStyle,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
                           DropdownSearch(
-                              showSelectedItem: true,
-                              maxHeight: 400,
-                              mode: Mode.MENU,
-                              items: ["Bhavani Vivan", "Bahavani Aravindham","Bhavani Vivan", "Bahavani Aravindham","Bhavani Vivan", "Bahavani Aravindham",],
-                              label: "Construction Site",
-                              onChanged: print,
-                              selectedItem: "Choose Construction Site",
-                              showSearchBox: true),
-                          SizedBox(height: 20,),
-                          Text("Block",style: titleStyle,),
-                          SizedBox(height: 20,),
+                            showSelectedItem: true,
+                            maxHeight: 400,
+                            mode: Mode.MENU,
+                            items: [
+                              "Bhavani Vivan",
+                              "Bahavani Aravindham",
+                              "Bhavani Vivan",
+                              "Bahavani Aravindham",
+                              "Bhavani Vivan",
+                              "Bahavani Aravindham",
+                            ],
+                            label: "Construction Site",
+                            // onChanged: print,
+                            // selectedItem: "Choose Construction Site",
+                            // showSearchBox: true,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedConstructionSite = value;
+                              });
+                            },
+                            selectedItem: _selectedConstructionSite != ""
+                                ? _selectedConstructionSite
+                                : "Choose Construction Site",
+                            validate: (value) => value == null
+                                ? 'Construction Site required'
+                                : null,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            "Block",
+                            style: titleStyle,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
                           DropdownSearch(
-                              showSelectedItem: true,
-                              maxHeight: 400,
-                              mode: Mode.MENU,
-                              items: ["1st", "2nd", "3rd", "4th"],
-                              label: "Block",
-                              onChanged: print,
-                              selectedItem: "Choose Block",
-                              showSearchBox: true),
-                          SizedBox(height: 20,),
-                          Text("Concrete Type",style: titleStyle,),
-                          SizedBox(height: 20,),
+                            showSelectedItem: true,
+                            maxHeight: 400,
+                            mode: Mode.MENU,
+                            items: ["1st", "2nd", "3rd", "4th"],
+                            label: "Block",
+                            // onChanged: print,
+                            // selectedItem: "Choose Block",
+                            showSearchBox: true,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedBlock = value;
+                              });
+                            },
+                            selectedItem: _selectedBlock != ""
+                                ? _selectedBlock
+                                : "Choose Block",
+                            validate: (value) =>
+                                value == null ? 'Block required' : null,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            "Concrete Type",
+                            style: titleStyle,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
                           DropdownSearch(
-                              showSelectedItem: true,
-                              maxHeight: 400,
-                              mode: Mode.MENU,
-                              items: ["Concrete Type", "Sri Cements", "Vamsi Bricks"],
-                              label: "Concrete Type",
-                              onChanged: print,
-                              selectedItem: "Choose Concrete Type",
-                              showSearchBox: true),
-                          SizedBox(height: 20,),
+                            showSelectedItem: true,
+                            maxHeight: 400,
+                            mode: Mode.MENU,
+                            items: [
+                              "Concrete Type",
+                              "Sri Cements",
+                              "Vamsi Bricks"
+                            ],
+                            label: "Concrete Type",
+                            // onChanged: print,
+                            // selectedItem: "Choose Concrete Type",
+                            showSearchBox: true,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedConcreteType = value;
+                              });
+                            },
+                            selectedItem: _selectedConcreteType != ""
+                                ? _selectedConcreteType
+                                : "Choose Concrete Type",
+                            validate: (value) =>
+                                value == null ? 'Concrete Type required' : null,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Container(
-                                width: MediaQuery.of(context).size.width / 2 - 25,
+                                width:
+                                    MediaQuery.of(context).size.width / 2 - 25,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Text("From",style: titleStyle,),
-                                    SizedBox(height: 15,),
+                                    Text(
+                                      "From",
+                                      style: titleStyle,
+                                    ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
                                     GestureDetector(
                                       onTap: () => showPickerFrom(context),
                                       child: Container(
@@ -170,26 +260,32 @@ class _F_PrintEntries extends State<F_PrintEntries> {
                                               size: 18.0,
                                               color: backgroundColor,
                                             ),
-                                            SizedBox(width: 10,),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
                                             Text(
                                                 '${customFormat2.format(selectedDateFrom)}',
-                                                style: subTitleStyle
-                                            ),
+                                                style: subTitleStyle),
                                           ],
                                         ),
                                       ),
                                     ),
-
                                   ],
                                 ),
                               ),
                               Container(
-                                width: MediaQuery.of(context).size.width / 2 - 25,
+                                width:
+                                    MediaQuery.of(context).size.width / 2 - 25,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Text("To",style: titleStyle,),
-                                    SizedBox(height: 15,),
+                                    Text(
+                                      "To",
+                                      style: titleStyle,
+                                    ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
                                     GestureDetector(
                                       onTap: () => showPickerTo(context),
                                       child: Container(
@@ -200,11 +296,12 @@ class _F_PrintEntries extends State<F_PrintEntries> {
                                               size: 18.0,
                                               color: backgroundColor,
                                             ),
-                                            SizedBox(width: 10,),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
                                             Text(
                                                 '${customFormat2.format(selectedDateTo)}',
-                                                style: subTitleStyle
-                                            ),
+                                                style: subTitleStyle),
                                           ],
                                         ),
                                       ),
@@ -214,12 +311,12 @@ class _F_PrintEntries extends State<F_PrintEntries> {
                               ),
                             ],
                           ),
-
-
                         ],
                       ),
                     ),
-                    SizedBox(height: 20,),
+                    SizedBox(
+                      height: 20,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -230,7 +327,15 @@ class _F_PrintEntries extends State<F_PrintEntries> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => PrintPreviewConcrete(),),
+                                MaterialPageRoute(
+                                  builder: (context) => PrintPreviewConcrete(
+                                    site: _selectedConstructionSite,
+                                    block: _selectedBlock,
+                                    concreteType: _selectedConcreteType,
+                                    fromDate: selectedDateFrom,
+                                    toDate: selectedDateTo,
+                                  ),
+                                ),
                               );
                             },
                             child: Container(
@@ -254,7 +359,9 @@ class _F_PrintEntries extends State<F_PrintEntries> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 300,),
+                    SizedBox(
+                      height: 300,
+                    ),
                   ],
                 ),
               ),
@@ -265,4 +372,3 @@ class _F_PrintEntries extends State<F_PrintEntries> {
     );
   }
 }
-

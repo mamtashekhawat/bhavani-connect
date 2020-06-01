@@ -2,20 +2,34 @@ import 'package:bhavaniconnect/common_variables/app_colors.dart';
 import 'package:bhavaniconnect/common_variables/app_fonts.dart';
 import 'package:bhavaniconnect/common_widgets/custom_appbar_widget/custom_app_bar.dart';
 import 'package:bhavaniconnect/common_widgets/custom_appbar_widget/custom_app_bar_2.dart';
+import 'package:bhavaniconnect/common_widgets/firebase_widget.dart';
 import 'package:bhavaniconnect/common_widgets/offline_widgets/offline_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AddProgressRemarks extends StatelessWidget {
+  final String currentUserId;
+  final String concreteId;
+  const AddProgressRemarks({Key key, this.currentUserId, this.concreteId})
+      : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: F_AddProgressRemarks(),
+      child: F_AddProgressRemarks(
+        currentUserId: currentUserId,
+        concreteId: concreteId,
+      ),
     );
   }
 }
 
 class F_AddProgressRemarks extends StatefulWidget {
+  final String currentUserId;
+  final String concreteId;
+  const F_AddProgressRemarks({Key key, this.currentUserId, this.concreteId})
+      : super(key: key);
+
   @override
   _F_AddProgressRemarks createState() => _F_AddProgressRemarks();
 }
@@ -48,7 +62,7 @@ class _F_AddProgressRemarks extends State<F_AddProgressRemarks> {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70),
+        preferredSize: Size.fromHeight(72),
         child: CustomAppBarDark(
           leftActionBar: Icon(
             Icons.arrow_back_ios,
@@ -182,7 +196,8 @@ class _F_AddProgressRemarks extends State<F_AddProgressRemarks> {
                           width: 180,
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.pop(context, true);
+                              addProgress(widget.concreteId);
+                              // Navigator.pop(context, true);
                             },
                             child: Container(
                               decoration: BoxDecoration(
@@ -216,5 +231,24 @@ class _F_AddProgressRemarks extends State<F_AddProgressRemarks> {
         ),
       ),
     );
+  }
+
+  void addProgress(String concreteId) async {
+    if (!_formKey.currentState.validate()) return;
+    _formKey.currentState.save();
+
+    await progressRef.document().setData({
+      "concreteId": "$concreteId",
+      "yesterdayProgress": _yesterdayProgressController.text,
+      "remarks": _remarkController.text,
+      "createdBy": widget.currentUserId,
+      "createdOn": DateTime.now().toUtc(),
+    });
+
+    _yesterdayProgressController.clear();
+    _remarkController.clear();
+    _remarkController.clear();
+
+    Navigator.pop(context, true);
   }
 }

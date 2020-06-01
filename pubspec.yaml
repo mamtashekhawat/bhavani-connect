@@ -66,6 +66,8 @@ dependencies:
   path_provider: ^1.6.9
   firebase_messaging: ^6.0.15
   device_info: ^0.4.2+4
+  shared_preferences: ^0.5.7+3
+  flutter_svg:
 
 dev_dependencies:
   flutter_test:
@@ -140,6 +142,7 @@ flutter:
     - images/profile.jpeg
     - images/googl-logo.png
     - images/google-lodgo.png 
+    - images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

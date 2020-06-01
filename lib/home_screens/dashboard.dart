@@ -17,15 +17,22 @@ import 'Concrete_Entries/Concrete_HomePage.dart';
 import 'Labour_Report/Daily_labour_Report.dart';
 
 class Dashboard extends StatelessWidget {
+  final String currentUserId;
+  const Dashboard({Key key, this.currentUserId}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: F_Dashboard(),
+      child: F_Dashboard(
+        currentUserId: currentUserId,
+      ),
     );
   }
 }
 
 class F_Dashboard extends StatefulWidget {
+  final String currentUserId;
+  const F_Dashboard({Key key, this.currentUserId}) : super(key: key);
   @override
   _F_Dashboard createState() => _F_Dashboard();
 }
@@ -229,7 +236,11 @@ class _F_Dashboard extends State<F_Dashboard> {
                                   break;
                                 case 'Concrete Entries':
                                   {
-                                    GoToPage(context, ConcreteEntries());
+                                    GoToPage(
+                                        context,
+                                        ConcreteEntries(
+                                          currentUserId: widget.currentUserId,
+                                        ));
                                   }
                                   break;
                                 case 'Labour Report':

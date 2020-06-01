@@ -4,20 +4,56 @@ import 'package:bhavaniconnect/common_widgets/custom_appbar_widget/custom_app_ba
 import 'package:bhavaniconnect/common_widgets/custom_appbar_widget/custom_app_bar_2.dart';
 import 'package:bhavaniconnect/common_widgets/offline_widgets/offline_widget.dart';
 import 'package:calendar_timeline/calendar_timeline.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:vector_math/vector_math.dart' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PrintPreviewConcrete extends StatelessWidget {
+  final String site;
+  final String block;
+  final String concreteType;
+  final DateTime fromDate;
+  final DateTime toDate;
+
+  const PrintPreviewConcrete({
+    Key key,
+    @required this.site,
+    @required this.block,
+    @required this.concreteType,
+    @required this.fromDate,
+    @required this.toDate,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: F_PrintPreviewConcrete(),
+      child: F_PrintPreviewConcrete(
+        site: site,
+        block: block,
+        concreteType: concreteType,
+        fromDate: fromDate,
+        toDate: toDate,
+      ),
     );
   }
 }
 
 class F_PrintPreviewConcrete extends StatefulWidget {
+  final String site;
+  final String block;
+  final String concreteType;
+  final DateTime fromDate;
+  final DateTime toDate;
+
+  const F_PrintPreviewConcrete(
+      {Key key,
+      this.site,
+      this.block,
+      this.concreteType,
+      this.fromDate,
+      this.toDate})
+      : super(key: key);
   @override
   _F_PrintPreviewConcrete createState() => _F_PrintPreviewConcrete();
 }
@@ -26,11 +62,9 @@ class _F_PrintPreviewConcrete extends State<F_PrintPreviewConcrete> {
   @override
   Widget build(BuildContext context) {
     return offlineWidget(context);
-
   }
 
-
-  Widget offlineWidget (BuildContext context){
+  Widget offlineWidget(BuildContext context) {
     return CustomOfflineWidget(
       onlineChild: Padding(
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -42,50 +76,74 @@ class _F_PrintPreviewConcrete extends State<F_PrintPreviewConcrete> {
   }
 
   Widget _buildContent(BuildContext context) {
+    // var timestamp = widget.fromDate;
+    // final fromDateTimestamp = (timestamp as Timestamp).toDate();
+    final fromDateFormated = DateFormat('dd MMMM').format(widget.fromDate);
+    final toDateFormated = DateFormat('dd MMMM').format(widget.toDate);
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: PreferredSize(
-        preferredSize:
-        Size.fromHeight(70),
+        preferredSize: Size.fromHeight(72),
         child: CustomAppBarDark(
-          leftActionBar: Icon(Icons.arrow_back_ios,size: 25,color: Colors.white,),
-          leftAction: (){
-            Navigator.pop(context,true);
+          leftActionBar: Icon(
+            Icons.arrow_back_ios,
+            size: 25,
+            color: Colors.white,
+          ),
+          leftAction: () {
+            Navigator.pop(context, true);
           },
-          rightActionBar: Icon(Icons.print,size: 25,color: Colors.white),
-          rightAction: (){
+          rightActionBar: Icon(Icons.print, size: 25, color: Colors.white),
+          rightAction: () {
             print('right action bar is pressed in appbar');
           },
           primaryText: 'Print Preview',
           tabBarWidget: null,
         ),
       ),
-      body:ClipRRect(
+      body: ClipRRect(
         borderRadius: BorderRadius.only(
-            topRight: Radius.circular(50.0),
-            topLeft: Radius.circular(50.0)),
+            topRight: Radius.circular(50.0), topLeft: Radius.circular(50.0)),
         child: Container(
           color: Colors.white,
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                SizedBox(height: 20,),
+                SizedBox(
+                  height: 20,
+                ),
                 Column(
                   children: [
-                    Text("21 October to 30 November",style: subTitleStyleDark1,),
-                    SizedBox(height: 5,),
+                    Text(
+                      "$fromDateFormated to $toDateFormated",
+                      style: subTitleStyleDark1,
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Bhavani Vivan (Block-1)",style: descriptionStyleDarkBlur2,),
-                        Text(" | ",style: descriptionStyleDarkBlur2,),
-                        Text("SuperStrong",style: descriptionStyleDarkBlur2,),
+                        Text(
+                          "${widget.site} (Block-${widget.block})",
+                          style: descriptionStyleDarkBlur2,
+                        ),
+                        Text(
+                          " | ",
+                          style: descriptionStyleDarkBlur2,
+                        ),
+                        Text(
+                          "SuperStrong",
+                          style: descriptionStyleDarkBlur2,
+                        ),
                       ],
                     ),
                   ],
                 ),
-                SizedBox(height: 40,),
+                SizedBox(
+                  height: 40,
+                ),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
@@ -94,66 +152,125 @@ class _F_PrintPreviewConcrete extends State<F_PrintPreviewConcrete> {
                     showCheckboxColumn: false,
                     dataRowHeight: 70.0,
                     columns: <DataColumn>[
-                      DataColumn(label: Text("S.No.",style: subTitleStyle1,)),
-                      DataColumn(label: Text("Concrete Type",style: subTitleStyle1,)),
-                      DataColumn(label: Text("Created On",style: subTitleStyle1,)),
-                      DataColumn(label: Text("Created By",style: subTitleStyle1,)),
-                      DataColumn(label: Text("Construction Site",style: subTitleStyle1,)),
-                      DataColumn(label: Text("Block",style: subTitleStyle1,)),
-                      DataColumn(label: Text("Total Progress",style: subTitleStyle1,)),
-                      DataColumn(label: Text("Remarks",style: subTitleStyle1,)),
+                      DataColumn(
+                          label: Text(
+                        "S.No.",
+                        style: subTitleStyle1,
+                      )),
+                      DataColumn(
+                          label: Text(
+                        "Concrete Type",
+                        style: subTitleStyle1,
+                      )),
+                      DataColumn(
+                          label: Text(
+                        "Created On",
+                        style: subTitleStyle1,
+                      )),
+                      DataColumn(
+                          label: Text(
+                        "Created By",
+                        style: subTitleStyle1,
+                      )),
+                      DataColumn(
+                          label: Text(
+                        "Construction Site",
+                        style: subTitleStyle1,
+                      )),
+                      DataColumn(
+                          label: Text(
+                        "Block",
+                        style: subTitleStyle1,
+                      )),
+                      DataColumn(
+                          label: Text(
+                        "Total Progress",
+                        style: subTitleStyle1,
+                      )),
+                      DataColumn(
+                          label: Text(
+                        "Remarks",
+                        style: subTitleStyle1,
+                      )),
                     ],
                     rows: items
                         .map(
-                          (itemRow) => DataRow(onSelectChanged: (b) {},
-                        cells: [
-                          DataCell(
-                            Text(itemRow.slNo,style:descriptionStyleDark,),
-                            showEditIcon: false,
-                            placeholder: false,
+                          (itemRow) => DataRow(
+                            onSelectChanged: (b) {},
+                            cells: [
+                              DataCell(
+                                Text(
+                                  itemRow.slNo,
+                                  style: descriptionStyleDark,
+                                ),
+                                showEditIcon: false,
+                                placeholder: false,
+                              ),
+                              DataCell(
+                                Text(
+                                  itemRow.concType,
+                                  style: descriptionStyleDark,
+                                ),
+                                showEditIcon: false,
+                                placeholder: false,
+                              ),
+                              DataCell(
+                                Text(
+                                  itemRow.date,
+                                  style: descriptionStyleDark,
+                                ),
+                                showEditIcon: false,
+                                placeholder: false,
+                              ),
+                              DataCell(
+                                Text(
+                                  itemRow.createdBy,
+                                  style: descriptionStyleDark,
+                                ),
+                                showEditIcon: false,
+                                placeholder: false,
+                              ),
+                              DataCell(
+                                Text(
+                                  itemRow.site,
+                                  style: descriptionStyleDark,
+                                ),
+                                showEditIcon: false,
+                                placeholder: false,
+                              ),
+                              DataCell(
+                                Text(
+                                  itemRow.block,
+                                  style: descriptionStyleDark,
+                                ),
+                                showEditIcon: false,
+                                placeholder: false,
+                              ),
+                              DataCell(
+                                Text(
+                                  itemRow.totalProg,
+                                  style: descriptionStyleDark,
+                                ),
+                                showEditIcon: false,
+                                placeholder: false,
+                              ),
+                              DataCell(
+                                Text(
+                                  itemRow.remarks,
+                                  style: descriptionStyleDark,
+                                ),
+                                showEditIcon: false,
+                                placeholder: false,
+                              ),
+                            ],
                           ),
-                          DataCell(
-                            Text(itemRow.concType,style:descriptionStyleDark,),
-                            showEditIcon: false,
-                            placeholder: false,
-                          ),
-                          DataCell(
-                            Text(itemRow.date,style:descriptionStyleDark,),
-                            showEditIcon: false,
-                            placeholder: false,
-                          ),
-                          DataCell(
-                            Text(itemRow.createdBy,style:descriptionStyleDark,),
-                            showEditIcon: false,
-                            placeholder: false,
-                          ),
-                          DataCell(
-                            Text(itemRow.site,style:descriptionStyleDark,),
-                            showEditIcon: false,
-                            placeholder: false,
-                          ),
-                          DataCell(
-                            Text(itemRow.block,style:descriptionStyleDark,),
-                            showEditIcon: false,
-                            placeholder: false,
-                          ),
-                          DataCell(
-                            Text(itemRow.totalProg,style:descriptionStyleDark,),
-                            showEditIcon: false,
-                            placeholder: false,
-                          ),
-                          DataCell(
-                            Text(itemRow.remarks,style:descriptionStyleDark,),
-                            showEditIcon: false,
-                            placeholder: false,
-                          ),
-                        ],
-                      ),
-                    )
+                        )
                         .toList(),
                   ),
                 ),
-                SizedBox(height: 500,)
+                SizedBox(
+                  height: 500,
+                )
               ],
             ),
           ),
@@ -174,7 +291,6 @@ class ItemInfo {
   String remarks;
 
   ItemInfo({
-
     this.slNo,
     this.date,
     this.createdBy,
@@ -195,9 +311,7 @@ var items = <ItemInfo>[
       block: "8th",
       concType: "Super Strong",
       totalProg: "60",
-      remarks: 'Transfer from store to cnstruction Site'
-
-  ),
+      remarks: 'Transfer from store to cnstruction Site'),
   ItemInfo(
       slNo: '2',
       createdBy: "Vasanth (Manager)",
@@ -206,9 +320,7 @@ var items = <ItemInfo>[
       block: "8th",
       concType: "Super Strong",
       totalProg: "60",
-      remarks: 'Transfer from store to cnstruction Site'
-
-  ),
+      remarks: 'Transfer from store to cnstruction Site'),
   ItemInfo(
       slNo: '3',
       createdBy: "Vasanth (Manager)",
@@ -217,9 +329,7 @@ var items = <ItemInfo>[
       block: "8th",
       concType: "Super Strong",
       totalProg: "60",
-      remarks: 'Transfer from store to cnstruction Site'
-
-  ),
+      remarks: 'Transfer from store to cnstruction Site'),
   ItemInfo(
       slNo: '3',
       createdBy: "Vasanth (Manager)",
@@ -228,9 +338,7 @@ var items = <ItemInfo>[
       block: "8th",
       concType: "Super Strong",
       totalProg: "60",
-      remarks: 'Transfer from store to cnstruction Site'
-
-  ),
+      remarks: 'Transfer from store to cnstruction Site'),
   ItemInfo(
       slNo: '4',
       createdBy: "Vasanth (Manager)",
@@ -239,10 +347,5 @@ var items = <ItemInfo>[
       block: "8th",
       concType: "Super Strong",
       totalProg: "60",
-      remarks: 'Transfer from store to cnstruction Site'
-
-  ),
-
+      remarks: 'Transfer from store to cnstruction Site'),
 ];
-
-

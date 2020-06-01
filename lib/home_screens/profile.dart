@@ -10,6 +10,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
+  final String currentUserId;
+  const ProfilePage({Key key, this.currentUserId}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,20 +21,20 @@ class ProfilePage extends StatelessWidget {
 }
 
 class F_ProfilePage extends StatefulWidget {
+  final String currentUserId;
+  const F_ProfilePage({Key key, this.currentUserId}) : super(key: key);
   @override
   _F_ProfilePageState createState() => _F_ProfilePageState();
 }
 
 class _F_ProfilePageState extends State<F_ProfilePage> {
-
   int _n = 0;
   @override
   Widget build(BuildContext context) {
     return offlineWidget(context);
-
   }
 
-  Widget offlineWidget (BuildContext context){
+  Widget offlineWidget(BuildContext context) {
     return CustomOfflineWidget(
       onlineChild: Padding(
         padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -48,89 +50,164 @@ class _F_ProfilePageState extends State<F_ProfilePage> {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: PreferredSize(
-        preferredSize:
-        Size.fromHeight(60),
+        preferredSize: Size.fromHeight(60),
         child: CustomAppBarDark(
           primaryText: 'Profile',
           tabBarWidget: null,
-          leftActionBar: Icon(Icons.notifications,size: 30,color: Colors.transparent,),
-          rightActionBar: Icon(Icons.settings,size: 25,color: Colors.white,),
-          rightAction: (){
+          leftActionBar: Icon(
+            Icons.notifications,
+            size: 30,
+            color: Colors.transparent,
+          ),
+          rightActionBar: Icon(
+            Icons.settings,
+            size: 25,
+            color: Colors.white,
+          ),
+          rightAction: () {
             GoToPage(
               context,
               SettingsPage(),
             );
           },
-
         ),
       ),
       body: ClipRRect(
         borderRadius: BorderRadius.only(
-            topRight: Radius.circular(40.0),
-            topLeft: Radius.circular(40.0)),
+            topRight: Radius.circular(40.0), topLeft: Radius.circular(40.0)),
         child: Container(
           color: Colors.white,
           width: MediaQuery.of(context).size.width,
           height: double.infinity,
           child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(height: 10,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: AssetImage("images/profile.jpeg"),
-                          radius: 80,
-                        ),
-                      ],
+                    CircleAvatar(
+                      backgroundImage: AssetImage("images/profile.jpeg"),
+                      radius: 80,
                     ),
-                    SizedBox(height: 40,),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Name",style: descriptionStyleDarkBlur1,),
-                        SizedBox(height: 3,),
-                        Text("Vasanthakumar V G",style: subTitleStyleDark1,),
-                        SizedBox(height: 25,),
-                        Text("Contact No.",style: descriptionStyleDarkBlur1,),
-                        SizedBox(height: 3,),
-                        Text("+91 9585753459",style: subTitleStyleDark1,),
-                        SizedBox(height: 25,),
-                        Text("Date of Birth",style: descriptionStyleDarkBlur1,),
-                        SizedBox(height: 3,),
-                        Text("29 October 1996",style: subTitleStyleDark1,),
-                        SizedBox(height: 25,),
-                        Text("Gender",style: descriptionStyleDarkBlur1,),
-                        SizedBox(height: 3,),
-                        Text("Male",style: subTitleStyleDark1,),
-                        SizedBox(height: 25,),
-                        Text("Role",style: descriptionStyleDarkBlur1,),
-                        SizedBox(height: 3,),
-                        Text("Manager",style: subTitleStyleDark1,),
-                        SizedBox(height: 25,),
-                        Text("Site",style: descriptionStyleDarkBlur1,),
-                        SizedBox(height: 3,),
-                        Text("Bhavani Vivan",style: subTitleStyleDark1,),
-                        SizedBox(height: 25,),
-                        Text("Date of Joining",style: descriptionStyleDarkBlur1,),
-                        SizedBox(height: 3,),
-                        Text("25 May 2020",style: subTitleStyleDark1,),
-                        SizedBox(height: 25,),
-
-                      ],
-                    )
                   ],
                 ),
-              )
-          ),
+                SizedBox(
+                  height: 40,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Name",
+                      style: descriptionStyleDarkBlur1,
+                    ),
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      "Vasanthakumar V G",
+                      style: subTitleStyleDark1,
+                    ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    Text(
+                      "Contact No.",
+                      style: descriptionStyleDarkBlur1,
+                    ),
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      "+91 9585753459",
+                      style: subTitleStyleDark1,
+                    ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    Text(
+                      "Date of Birth",
+                      style: descriptionStyleDarkBlur1,
+                    ),
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      "29 October 1996",
+                      style: subTitleStyleDark1,
+                    ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    Text(
+                      "Gender",
+                      style: descriptionStyleDarkBlur1,
+                    ),
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      "Male",
+                      style: subTitleStyleDark1,
+                    ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    Text(
+                      "Role",
+                      style: descriptionStyleDarkBlur1,
+                    ),
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      "Manager",
+                      style: subTitleStyleDark1,
+                    ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    Text(
+                      "Site",
+                      style: descriptionStyleDarkBlur1,
+                    ),
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      "Bhavani Vivan",
+                      style: subTitleStyleDark1,
+                    ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    Text(
+                      "Date of Joining",
+                      style: descriptionStyleDarkBlur1,
+                    ),
+                    SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      "25 May 2020",
+                      style: subTitleStyleDark1,
+                    ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                  ],
+                )
+              ],
+            ),
+          )),
         ),
       ),
-
     );
   }
-
 }

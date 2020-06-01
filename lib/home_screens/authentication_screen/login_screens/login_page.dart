@@ -3,7 +3,6 @@ import 'package:bhavaniconnect/common_variables/app_functions.dart';
 import 'package:bhavaniconnect/common_widgets/button_widget/to_do_button.dart';
 import 'package:bhavaniconnect/common_widgets/offline_widgets/offline_widget.dart';
 import 'package:bhavaniconnect/home_screens/authentication_screen/login_screens/phone_number_page.dart';
-import 'package:bhavaniconnect/home_screens/authentication_screen/login_screens/phone_pageview.dart';
 import 'package:bhavaniconnect/home_screens/authentication_screen/registrtion_screens/sign_up_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -74,8 +73,7 @@ class LoginPage extends StatelessWidget {
                 text: 'Login with phone number',
                 textColor: activeButtonTextColor,
                 backgroundColor: activeButtonBackgroundColor,
-                onPressed: () => GoToPage(context,
-                    PhoneNumberPage()), //PhoneNumberPage() //PageViewDemo
+                onPressed: () => GoToPage(context, PhoneNumberPage()),
               ),
               SizedBox(height: 10.0),
               ToDoButton(

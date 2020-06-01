@@ -175,7 +175,7 @@ class _F_AddStockScreen extends State<F_AddStockScreen> {
                     height: 15,
                   ),
                   Container(
-                    height: 350,
+                    height: 380,
                     color: Colors.blue,
                     child: buildListStockCard(),
                   ),
